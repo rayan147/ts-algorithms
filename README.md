@@ -5,9 +5,9 @@ A collection of algorithms and data structures implemented in TypeScript.
 ## Installation
 
 ```bash
-npm install @rayanramirez/ts-algorithms
+npm install @rayan147/ts-algorithms
 # or
-pnpm add @rayanramirez/ts-algorithms
+pnpm add @rayan147/ts-algorithms
 ```
 
 ## Usage
