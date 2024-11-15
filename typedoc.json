@@ -1,0 +1,19 @@
+{
+  "entryPoints": [
+    "src",
+  ],
+  "out": "docs",
+  "name": "TypeScript Data Structures",
+  "theme": "default",
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**"
+  ],
+  "includeVersion": true,
+  "hideGenerator": true,
+  "searchInComments": true,
+  "plugin": [
+    "typedoc-plugin-markdown"
+  ],
+  "readme": "README.md"
+}

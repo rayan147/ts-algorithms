@@ -1,3 +1,7 @@
+**TypeScript Data Structures v1.0.1** • [**Docs**](modules.md)
+
+***
+
 # TypeScript Algorithms and Data Structures
 
 A collection of algorithms and data structures implemented in TypeScript.
