@@ -1,345 +1,351 @@
+// linkedList.ts
+
 import LinkedListNode from "./linkedListNode";
 
-
 /**
- * A generic LinkedList implementation that manages a sequence of nodes.
- * Each node contains a value and a reference to the next node.
- * 
- * @template T - The type of elements stored in the LinkedList
- * @example
- * ```typescript
- * const list = new LinkedList<number>();
- * list.append(1);
- * list.append(2);
- * list.prepend(0);
- * console.log(list.size); // 3
- * ```
+ * A generic singly linked list implementation.
  */
+export default class LinkedList<T> implements Iterable<T> {
+  private head: LinkedListNode<T> | null;
+  private tail: LinkedListNode<T> | null;
+  private _size: number;
 
-export default class LinkedList<T> {
-  public head: LinkedListNode<T> | null;
-  public tail: LinkedListNode<T> | null;
-  public _size: number
-
-  constructor(head = null, tail = null, size = 0) {
-    this.head = head;
-    this.tail = tail;
-    this._size = size;
+  constructor() {
+    this.head = null;
+    this.tail = null;
+    this._size = 0;
   }
 
+  /**
+   * Get the number of elements in the linked list.
+   */
   get size(): number {
     return this._size;
   }
 
   /**
-   * Adds a new element to the beginning of the LinkedList.
-   * 
-   * @param {T} value - The value to prepend
-   * @returns {void}
-   * 
-   * @example
-   * ```typescript
-   * const list = new LinkedList<number>();
-   * list.prepend(1); // List: 1
-   * list.prepend(2); // List: 2 -> 1
-   * ```
+   * Check if the linked list is empty.
    */
-
-
-
-  prepend(value: T): LinkedList<T> {
-    const newNode = new LinkedListNode(value, this.head);
-    this.head = newNode
-
-    if (!this.tail) this.tail = newNode;
-
-    this._size++
-    return this
+  isEmpty(): boolean {
+    return this._size === 0;
   }
 
   /**
-   * Adds a new element to the end of the LinkedList.
-   * 
-   * @param {T} value - The value to append
-   * @returns {void}
-   * 
-   * @example
-   * ```typescript
-   * const list = new LinkedList<number>();
-   * list.append(1); // List: 1
-   * list.append(2); // List: 1 -> 2
-   * ```
+   * Add a new element at the beginning of the list.
+   * @param value The value to prepend.
+   * @returns The linked list instance.
    */
-  append(value: T): LinkedList<T> {
+  prepend(value: T): this {
     const newNode = new LinkedListNode(value);
+    newNode.next = this.head;
+    this.head = newNode;
 
-    if (!this.head) {
-      this.head = newNode;
+    if (!this.tail) {
       this.tail = newNode;
-    } else {
-      if (this.tail) {
-        this.tail.next = newNode;
-        this.tail = newNode;
-      }
     }
 
     this._size++;
     return this;
   }
 
-
   /**
-   * Inserts a new element at the specified index in the LinkedList.
-   * 
-   * @param {T} value - The value to insert into the LinkedList
-   * @param {number} rawIndex - The position at which to insert the value (normalized to be non-negative)
-   * @returns {LinkedList<T>} The LinkedList instance for method chaining
-   * 
-   * @remarks
-   * - If rawIndex < 0, the value is inserted at the beginning (index 0)
-   * - If rawIndex >= size, the value is appended to the end
-   * - For valid indices, the value is inserted at the specified position
-   * 
-   * @example
-   * ```typescript
-   * const list = new LinkedList<number>();
-   * list.append(1).append(2).append(3);  // List: 1 -> 2 -> 3
-   * list.insert(99, 1);                  // List: 1 -> 99 -> 2 -> 3
-   * ```
-   * 
-   * Visual representation of insertion at index 2:
-   * ```
-   * Before insertion of 99 at index 2:
-   * 1 -> 2 -> 3 -> 4
-   * 
-   * Steps:
-   * 1. Traverse to node at index 1 (value 2)
-   * 2. Create new node (99)
-   * 3. Set new node's next to current node's next
-   * 4. Set current node's next to new node
-   * 
-   * After insertion:
-   * 1 -> 2 -> 99 -> 3 -> 4
-   * ```
-   * 
-   * Edge cases:
-   * ```typescript
-   * // Insert at beginning (index 0 or negative)
-   * list.insert(99, 0);   // Same as prepend
-   * list.insert(99, -1);  // Normalized to index 0
-   * 
-   * // Insert at end (index >= size)
-   * list.insert(99, 999); // Same as append
-   * ```
-   * 
-   * @throws {TypeError} Throws if value is undefined or null
-   * 
-   * @see {@link prepend} For inserting at the beginning
-   * @see {@link append} For inserting at the end
+   * Add a new element at the end of the list.
+   * @param value The value to append.
+   * @returns The linked list instance.
    */
-
-  insert(value: T, rawIndex: number): LinkedList<T> {
-    const index = rawIndex < 0 ? 0 : rawIndex;
-
-    if (index === 0 || !this.head) return this.prepend(value)
-
-    if (index >= this._size) return this.append(value)
-
-    let currentnode = this.head
-
-    for (let i = 0; i < index - 1; i++) {
-      currentnode = currentnode.next as LinkedListNode<T>;
-    }
-
-    const newnode = new LinkedListNode<T>(value, currentnode.next)
-
-    currentnode.next = newnode
-    this._size++
-    return this
-
-  }
-
-  /**
-   *@param {T}  value
-   *@returns {LinkedListNode<T> | null}
-   *
-   *
-   *
-   */
-  delete(value: T): LinkedListNode<T> | null {
-    if (!this.head) return null;
-
-    let deleteNode: null | LinkedListNode<T> = new LinkedListNode<T>(value)
-
-
-    while (this.head && this.areEqual(this.head, deleteNode)) {
-      deleteNode = this.head;
-      this.head = this.head.next as LinkedListNode<T>;
-    }
-
-    let currentNode = this.head;
-
-    if (currentNode !== null) {
-      while (currentNode.next) {
-        if (this.areEqual(
-          currentNode.next as LinkedListNode<T>, deleteNode)) {
-          deleteNode = currentNode.next as LinkedListNode<T>;
-          currentNode.next = currentNode.next?.next
-        }
-        currentNode = currentNode.next as LinkedListNode<T>
-      }
-    }
-    this._size--;
-    return deleteNode
-  }
-
-  private areEqual(value1: LinkedListNode<T>, value2: LinkedListNode<T>): boolean {
-    if (value1.value === value2.value) return true
-    return false
-
-  }
-  /**
-   * Clears all elements from the LinkedList.
-   * 
-   * @returns {void}
-   * 
-   * @example
-   * ```typescript
-   * const list = new LinkedList<number>();
-   * list.append(1);
-   * list.clear();
-   * console.log(list.size); // 0
-   * ```
-   */
-  clear(): void {
-    this.head = null;
-    this._size = 0;
-  }
-
-  /**
-   * Converts the LinkedList to an array of values (not nodes).
-   * 
-   * @returns {T[]} An array containing all values in the LinkedList
-   * 
-   * @example
-   * ```typescript
-   * const list = new LinkedList<number>();
-   * list.append(1).append(2);
-   * console.log(list.toArray()); // [1, 2]
-   * ```
-   */
-  toArray(): T[] {  // Changed return type to T[] instead of LinkedListNode<T>[]
-    const values: T[] = [];
-    let currentNode = this.head;
-
-    while (currentNode !== null) {
-      values.push(currentNode.value);  // Push the value, not the entire node
-      currentNode = currentNode.next as LinkedListNode<T>;
-    }
-
-    return values;
-  }
-
-  /**
- * Checks if the LinkedList is empty.
- * 
- * @returns {boolean} True if the LinkedList has no elements, false otherwise
- * 
- * @example
- * ```typescript
- * const list = new LinkedList<number>();
- * console.log(list.isEmpty()); // true
- * list.append(1);
- * console.log(list.isEmpty()); // false
- * ```
- */
-  isEmpty(): boolean {
-    return this._size === 0;
-  }
-
-  /**
-  * @return {string}
-  */
-  toString(): string {
-    return `LinkList(${this.toArray().join(' -> ')})`;
-  }
-
-
-  // update(value: T, rawIndex: number): LinkedList<T> {
-  //   const index = rawIndex < 0 ? 0 : rawIndex;
-  //   if (index >= this._size) return this.append(value)
-  //
-  //   let currentNode = this.head
-  //
-  //   for (let i = 0; i < index; i++) {
-  //     if (currentNode === null) throw new Error('index out of bound')
-  //     currentNode = currentNode.next as LinkedListNode<T>
-  //   }
-  //
-  //   if (currentNode) {
-  //     currentNode.value = value
-  //
-  //   }
-  //   return this
-  // }
-
-  update(value: T, rawIndex: number): LinkedList<T> {
-    const index = rawIndex < 0 ? 0 : rawIndex;
+  append(value: T): this {
+    const newNode = new LinkedListNode(value);
 
     if (!this.head) {
-      const newNode = new LinkedListNode<T>(value)
-      this.head = newNode
-      if (!this.tail) this.tail = newNode;
-      this._size++
-      return this
+      this.head = newNode;
+      this.tail = newNode;
+    } else if (this.tail) {
+      this.tail.next = newNode;
+      this.tail = newNode;
     }
 
-    if (index >= this._size) {
-      const newNode = new LinkedListNode<T>(value)
-      if (this.tail) {
-        this.tail.next = newNode;
-        this.tail = newNode
+    this._size++;
+    return this;
+  }
 
+  /**
+   * Insert a new element at a specific index.
+   * @param value The value to insert.
+   * @param index The position to insert the value at.
+   * @returns The linked list instance.
+   */
+  insert(value: T, index: number): this {
+    const sanitizedIndex = Math.max(0, Math.min(index, this._size));
+
+    if (sanitizedIndex === 0 || !this.head) {
+      return this.prepend(value);
+    }
+
+    if (sanitizedIndex === this._size) {
+      return this.append(value);
+    }
+
+    let currentNode = this.head;
+    for (let i = 0; i < sanitizedIndex - 1 && currentNode.next; i++) {
+      currentNode = currentNode.next;
+    }
+
+    const newNode = new LinkedListNode(value);
+    newNode.next = currentNode.next;
+    currentNode.next = newNode;
+    this._size++;
+    return this;
+  }
+
+  /**
+   * Remove the first occurrence of a value from the list.
+   * @param value The value to remove.
+   * @returns The removed node or null if not found.
+   */
+  delete(value: T): LinkedListNode<T> | null {
+    if (!this.head) {
+      return null;
+    }
+
+    // Handle head deletion
+    if (this.head.value === value) {
+      const deleteNode = this.head;
+      this.head = this.head.next;
+      if (!this.head) {
+        this.tail = null;
       }
+      this._size--;
+      return deleteNode;
+    }
 
+    let currentNode = this.head;
+    // Search for the node to delete
+    while (currentNode.next) {
+      if (currentNode.next.value === value) {
+        const deleteNode = currentNode.next;
+        currentNode.next = deleteNode.next;
+        if (deleteNode === this.tail) {
+          this.tail = currentNode;
+        }
+        this._size--;
+        return deleteNode;
+      }
+      currentNode = currentNode.next;
+    }
 
+    return null;
+  }
+
+  /**
+   * Remove the last element from the list.
+   * @returns The removed node.
+   * @throws Error if the list is empty.
+   */
+  deleteLast(): LinkedListNode<T> | null {
+    if (this.isEmpty()) {
+      throw new Error(`Can't remove from an empty LinkedList`);
+    }
+
+    if (this.head === this.tail) {
+      const deleteNode = this.head;
+      this.head = null;
+      this.tail = null;
+      this._size--;
+      return deleteNode;
+    }
+
+    let currentNode = this.head;
+    // Find the second-to-last node
+    while (currentNode !== null && currentNode.next && currentNode.next !== this.tail) {
+      currentNode = currentNode.next;
+    }
+
+    if (currentNode !== null && !currentNode.next) return null;
+
+    // Store the last node to return
+    const deleteNode = this.tail;
+
+    // Update tail and remove reference to delete node
+    this.tail = currentNode;
+
+    this.tail!.next = null;
+
+    this._size--;
+    return deleteNode;
+  }
+
+  /**
+   * Update the value of a node at a specific index.
+   * @param value The new value.
+   * @param index The index of the node to update.
+   * @returns The linked list instance.
+   */
+  update(value: T, index: number): this {
+    const sanitizedIndex = Math.max(0, Math.min(index, this._size - 1));
+
+    if (!this.head) {
+      return this.append(value);
     }
 
     let currentNode = this.head;
     let currentIndex = 0;
 
-
-    while (currentIndex < index && currentNode !== null) {
-      currentNode = currentNode.next as LinkedListNode<T>;
-      console.log(currentNode)
-      currentIndex++
-
+    while (currentIndex < sanitizedIndex && currentNode.next) {
+      currentNode = currentNode.next;
+      currentIndex++;
     }
 
-    if (currentNode) {
-      currentNode.value = value
-
-    }
-
-    return this
-
+    currentNode.value = value;
+    return this;
   }
 
+  /**
+   * Clear the linked list.
+   * @param immediate Whether to immediately clear all node references.
+   */
+  clear(): void {
+    this.head = null;
+    this.tail = null;
+    this._size = 0;
+  }
+
+  /**
+   * Validate if the linked list has been properly cleared.
+   * @returns True if cleared, else false.
+   */
+  validateCleared(): boolean {
+    return this.head === null && this.tail === null && this._size === 0;
+  }
+
+  /**
+   * Convert the linked list to an array.
+   * @returns An array of values.
+   */
+  toArray(): T[] {
+    const values: T[] = [];
+    let current = this.head;
+    while (current) {
+      values.push(current.value);
+      current = current.next;
+    }
+    return values;
+  }
+
+  /**
+   * Convert the linked list to a string representation.
+   * @returns A string representing the linked list.
+   */
+  toString(): string {
+    return `LinkedList(${this.toArray().join(' -> ')})`;
+  }
+
+  /**
+   * Clone the linked list.
+   * @returns A new linked list that is a deep copy of the current list.
+   */
+  clone(): LinkedList<T> {
+    const newList = new LinkedList<T>();
+    if (!this.head) return newList;
+
+    newList.head = this.head.clone();
+    let currentOriginal = this.head.next;
+    let currentClone = newList.head;
+
+    while (currentOriginal) {
+      currentClone.next = new LinkedListNode(currentOriginal.value);
+      currentClone = currentClone.next;
+      currentOriginal = currentOriginal.next;
+    }
+
+    newList.tail = currentClone;
+    newList._size = this._size;
+
+    return newList;
+  }
+
+  /**
+   * Create a linked list from an array.
+   * @param values The array of values.
+   * @returns A new linked list.
+   */
+  static fromArray<U>(values: U[]): LinkedList<U> {
+    const list = new LinkedList<U>();
+    if (values.length === 0) return list;
+
+    list.head = LinkedListNode.fromArray(values);
+    let current = list.head;
+    while (current && current.next) {
+      current = current.next;
+    }
+    list.tail = current;
+    list._size = values.length;
+
+    return list;
+  }
+
+  /**
+   * Compare this linked list with another for equality.
+   * @param other The other linked list to compare with.
+   * @returns True if both lists are equal, else false.
+   */
+  equals(other: LinkedList<T>): boolean {
+    return LinkedListNode.areEqual(this.head, other.head);
+  }
+  /**
+   * Find the first node matching the predicate.
+   * @param predicate A function to test each element.
+   * @returns The found node or null.
+   */
+
+  /**
+ * Reverse the linked list.
+ * @returns The reversed linked list.
+ */
+
+  reverse(): this {
+    let prev: LinkedListNode<T> | null = null;
+    let current = this.head;
+    this.tail = this.head;
+
+    while (current) {
+      const next = current.next;
+      current.next = prev;
+      prev = current;
+      current = next;
+    }
+
+    this.head = prev;
+    return this;
+  }
+
+  find(predicate: (value: T) => boolean): LinkedListNode<T> | null {
+    let current = this.head;
+    while (current) {
+      if (predicate(current.value)) {
+        return current;
+      }
+      current = current.next;
+    }
+    return null;
+  }
+  /**
+   * Make the linked list iterable.
+   */
+
+  [Symbol.iterator](): Iterator<T> {
+    let current = this.head;
+    return {
+      next(): IteratorResult<T> {
+        if (current) {
+          const value = current.value;
+          current = current.next;
+          return { value, done: false };
+        } else {
+          return { value: undefined as any, done: true };
+        }
+      },
+    };
+  }
 }
 
-
-
-const list = new LinkedList<number>();
-list.append(1).append(2).append(3).prepend(0);  // List: 1 -> 2 -> 3
-list.insert(99, 1);                  // List: 1 -> 99 -> 2 -> 3
-list.insert(120, 1).insert(47, 0).update(10, 7)
-  .update(541, 0)
-const size = list.size
-const str = list.toString()
-
-
-console.log({
-  str,
-  size,
-})
 
