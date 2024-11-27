@@ -31,6 +31,15 @@ export default class LinkedList<T> implements Iterable<T> {
   }
 
   /**
+   *@returns the value of the head if it exists
+   *
+   */
+
+  peek(): T | null {
+    return this.isEmpty() ? null : this.head!.value;
+  }
+
+  /**
    * Add a new element at the beginning of the list.
    * @param value The value to prepend.
    * @returns The linked list instance.
@@ -143,7 +152,7 @@ export default class LinkedList<T> implements Iterable<T> {
    */
   deleteLast(): LinkedListNode<T> | null {
     if (this.isEmpty()) {
-      throw new Error(`Can't remove from an empty LinkedList`);
+      return null
     }
 
     if (this.head === this.tail) {
@@ -328,21 +337,35 @@ export default class LinkedList<T> implements Iterable<T> {
     }
     return null;
   }
+
+  deleteHead(): LinkedListNode<T> | null {
+    if (!this.head) return null
+
+    const deleteHead = this.head
+    this.head = deleteHead.next
+
+    if (!this.head) {
+      this.tail = null
+    }
+
+    this._size--;
+    return deleteHead
+  }
+
   /**
    * Make the linked list iterable.
    */
+  [Symbol.iterator](): Iterator<T> {  // Makes object iterable using for...of
+    let current = this.head;          // Tracks current node during iteration
 
-  [Symbol.iterator](): Iterator<T> {
-    let current = this.head;
     return {
-      next(): IteratorResult<T> {
-        if (current) {
-          const value = current.value;
-          current = current.next;
-          return { value, done: false };
-        } else {
-          return { value: undefined as any, done: true };
+      next(): IteratorResult<T> {     // Required method that returns {value, done}
+        if (current) {                // If we have a current node:
+          const value = current.value; // Get its value
+          current = current.next;      // Move to next node
+          return { value, done: false }; // Return value and indicate more items exist
         }
+        return { value: undefined as any, done: true }; // End of list reached
       },
     };
   }

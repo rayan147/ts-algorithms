@@ -21,6 +21,17 @@ describe('Stack', () => {
   });
 
   test('pop returns undefined when stack is empty', () => {
-    expect(stack.pop()).toBeUndefined();
+    expect(stack.pop()).toBeNull()
+  });
+
+  test('Queue is iterable', () => {
+    stack.push(1).push(2).push(3)
+
+    const values = [];
+    for (const value of stack) {
+      values.push(value);
+    }
+
+    expect(values).toEqual([1, 2, 3]);
   });
 });
